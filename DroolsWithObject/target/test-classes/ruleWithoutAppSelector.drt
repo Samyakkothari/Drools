@@ -1,0 +1,46 @@
+template header
+salience
+AgendaGroup
+ActivationGroup
+id
+ApplicationId
+ApplicationTypeID
+EntityCategory
+EntityType
+eval_order
+staging_context
+task_category
+task_parameters
+name
+task_performer_id
+is_deleted
+content_type
+selected_entities
+selected_attributes
+operation
+tenant_org_id
+display_name
+description
+pre_conditions
+create_ts
+update_ts
+
+
+import com.drool.example.Fact;
+import com.drool.example.Result;
+global java.util.List list;
+
+template "DataWithoutNull"
+
+rule "Rule1_@{row.rowNumber}"
+ activation-group "@{ActivationGroup}"
+ agenda-group "@{AgendaGroup}"
+ salience @{salience}
+ dialect "java"
+when
+      variable:Fact(((0==@{ApplicationTypeID} && 0==@{ApplicationId}) || (@{ApplicationTypeID} == applicationTypeId) || ( @{ApplicationId} == applicationId)) && ((0==@{EntityCategory} && 0==@{EntityType}) || (@{EntityCategory} == entityCategoryId) || ( @{EntityType} == entityTypeId)) && ("@{staging_context}" == stagingContext) && ("@{task_category}" == taskCategory))
+then
+      list.add(new Result(@{id},@{eval_order},"@{name}",@{task_performer_id},"@{is_deleted}","@{selected_entities}","@{selected_attributes}","@{operation}","@{display_name}","@{description}","@{create_ts}","@{update_ts}"));
+end
+
+end template

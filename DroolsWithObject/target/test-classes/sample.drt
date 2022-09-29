@@ -1,0 +1,49 @@
+template header
+salience
+uri
+names
+namedTags
+
+import com.drool.example.Fact;
+import java.util.*;
+import java.util.List;
+global java.util.List list;
+
+function Boolean toCompareMap(Map namedTagsMap, Map namedTags){
+      boolean flag;
+      if(namedTagsMap.equals(namedTags)){
+          flag = true;
+      }else{
+          flag = false;
+      }
+      return flag;
+}
+
+function Boolean mapCompare(String map,Map namedTagsMap){
+   boolean flag;
+   String replaced = map.replaceAll("[{|}]","");
+   java.util.Map<String,String> namedTag = new HashMap<>();
+   String[] split = replaced.split("[:|,=]");
+   for(int i=0;i<split.length;i=i+2) {
+        namedTag.put(split[i],split[i+1]);
+   }
+   if(namedTag.equals(namedTagsMap)){
+       flag = true;
+   }else{
+       flag = false;
+   }
+ return flag;
+}
+
+template "DataWithoutNull"
+
+rule "Rule1_@{row.rowNumber}"
+ salience @{salience}
+ dialect "java"
+when
+  variable:Fact(mapCompare("${namedTags}",namedTags))
+then
+  list.add("${uri}");
+end
+
+end template

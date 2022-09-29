@@ -1,0 +1,34 @@
+template header
+salience
+id
+ApplicationTypeName
+ApplicationIdentifier
+EntityCategory
+NativeType
+eval_order
+staging_context
+task_category
+uri
+
+import com.drool.example.NewFact;
+global java.util.List list;
+
+template "DataWithoutNull"
+
+rule "Rule1_@{row.rowNumber}"
+ salience @{salience}
+ dialect "java"
+when
+      variable:NewFact((("All"=="${ApplicationIdentifier}" && "All"=="${ApplicationTypeName}")
+       || (applicationIdentifier =="${ApplicationIdentifier}")
+       || (applicationTypeName == "${ApplicationTypeName}"))
+       && (("All"=="${EntityCategory}" && "All"=="${NativeType}")
+       || (entityCategory == "${EntityCategory}")
+       || ( nativeType == "${NativeType}"))
+       && (stagingContext == "${staging_context}")
+       && (taskCategory == "${task_category}"))
+then
+      list.add("@{uri}");
+end
+
+end template

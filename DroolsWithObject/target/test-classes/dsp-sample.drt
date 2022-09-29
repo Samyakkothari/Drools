@@ -1,0 +1,75 @@
+template header
+salience
+definitionName
+certificationService
+tags
+namedTags
+certificationType
+certificationContentType
+reviewOwner
+reviewName
+reviewExpiryDate
+processCount
+campaignNamePattern
+supportEmail
+campaignBatchNamePattern
+
+import com.drool.example.DspSampleFact;
+global java.util.List list;
+import java.util.Map;
+import java.util.List;
+
+function Boolean toCompareList(List targetList, List blackList){
+
+    Boolean flag = false;
+    for(Object obj: targetList){
+        if(blackList.contains(obj)){
+            flag = true;
+            break;
+        }
+    }
+    return flag;
+}
+
+function boolean compareNamedTags(Map namedTagsMap, Map namedTags){
+    System.out.println("Comparing the named Tags map");
+    boolean flag = false;
+    flag = namedTagsMap.equals(namedTags);
+    return flag;
+}
+
+template "DspSampleRuleFile"
+
+rule "Rule1_@{row.rowNumber}"
+ salience @{salience}
+ dialect "java"
+ when
+       $names: DspSampleFact($listOfTags:${tags})
+       variable:DspSampleFact((definitionName == "${definitionName}" && "null" !="${definitionName}")
+       ||(certificationService == "${certificationService}" && "null" !="${certificationService}")
+       ||(toCompareList(tags,$listOfTags))
+       ||(certificationType == "${certificationType}" && "null" !="${certificationType}")
+       ||(certificationContentType == "${certificationContentType}" && "null" !="${certificationContentType}")
+       ||(reviewOwner == "${reviewOwner}" && "null" !="${reviewOwner}")
+       ||(reviewName == "${reviewName}" && "null" !="${reviewName}")
+       ||(reviewExpiryDate == "${reviewExpiryDate}" && "null" !="${reviewExpiryDate}")
+       ||(processCount == ${processCount} && 0 !=${processCount}))
+ then
+       variable.setCampaignNamePattern("${campaignNamePattern}");
+       variable.setCampaignBatchNamePattern("${campaignBatchNamePattern}");
+       variable.setSupportEmail("${supportEmail}");
+ end
+
+ end template
+
+ template "map"
+ rule "testmap_@{row.rowNumber}"
+ when
+          $list:Map(map:"${namedTags}")
+          $review:Fact(
+         compareNamedTags($list,namedTags)
+          )
+ then
+ System.out.println("Value is present in the list: "+ $list.get("programName"));
+ end
+ end template
